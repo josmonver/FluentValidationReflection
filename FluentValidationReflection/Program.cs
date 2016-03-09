@@ -41,20 +41,13 @@ namespace FluentValidationReflection
             var properties = ReflectionHelper.GetShallowPropertiesInfo(obj);
             foreach (var prop in properties)
             {
+                // Create rule for each property, based on some data coming from other service...
                 RuleFor(o => o)
                     .CustomNotEmpty(obj.GetType().GetProperty(prop.Name))
-                    .NotEmpty()
                     .When(o =>
                 {
                     return true; // do other stuff...
                 });
-
-                // Create rule for each property, based on some data coming from other service...
-                ////RuleFor(o => o.Description).NotEmpty().When(o => // this works fine when foo.Description is null
-                //RuleFor(o => o.GetType().GetProperty(prop.Name)).NotEmpty().When(o =>
-                //{
-                //    return true; // do other stuff...
-                //});
             }
         }
     }
@@ -91,14 +84,10 @@ namespace FluentValidationReflection
 
         protected override bool IsValid(PropertyValidatorContext context)
         {
-            //Expression<Func<T, PropertyInfo>> expression = o => o.GetType().GetProperty(_propertyInfo.Name);
-            //Func<T, PropertyInfo> oFunc = expression.Compile();
-            //PropertyInfo oTargetDateTime = oFunc.Invoke((T)context.Instance);
-
             return !IsNullOrEmpty(_propertyInfo, (T)context.Instance);
         }
 
-        private bool IsNullOrEmpty<T>(PropertyInfo property, T obj)
+        private bool IsNullOrEmpty(PropertyInfo property, T obj)
         {
             var t = property.PropertyType;
             var v = property.GetValue(obj);
